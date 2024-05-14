@@ -1,3 +1,5 @@
+<!-- start README with comment to help doxygen find the first heading -->
+
 # TRIC - Testing Rules In C
 
 TRIC is a minimalistic unit testing framework for c. It has no external dependencies and is all contained in a single header file. Tests are automatically detected and are executed in separate processes. TRIC supports test fixtures and has a builtin and customizable reporting.
