@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doxygenlayout version="1.0">
+
+  <navindex>
+    <tab type="mainpage" title="Overview" />
+    <tab type="user" url="@ref tric.h" title="TRIC" />
+  </navindex>
+
+  <file>
+    <detaileddescription title="Introduction" />
+    <memberdef>
+      <defines title="Macros" />
+      <functions title="Functions" />
+      <typedefs title="Defined types" />
+      <inlineclasses title="Data structures" />
+      <enums title="Enumerations" />
+    </memberdef>
+  </file>
+
+</doxygenlayout>
