@@ -232,3 +232,9 @@ When the above code is run it produces the following output:
 
 
 
+## Documentation
+
+The documentation for TRIC can be generated using [doxygen](https://www.doxygen.nl) by running doxygen in the doc directory. The generated html documentation can then be found in the doc/html directory.
+
+
+
