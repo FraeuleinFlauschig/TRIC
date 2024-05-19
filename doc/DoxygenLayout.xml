@@ -4,6 +4,7 @@
   <navindex>
     <tab type="mainpage" title="Overview" />
     <tab type="user" url="@ref tric.h" title="TRIC" />
+    <tab type="user" url="@ref tric_assert.h" title="Assertions" />
   </navindex>
 
   <file>

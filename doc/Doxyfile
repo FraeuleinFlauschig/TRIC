@@ -1,6 +1,6 @@
 PROJECT_NAME = TRIC
 PROJECT_BRIEF = "Minimalistic unit testing framework for C"
-INPUT = ../tric.h ../README.md
+INPUT = ../tric.h ../tric_assert.h ../README.md
 QUIET = YES
 GENERATE_LATEX = NO
 USE_MDFILE_AS_MAINPAGE = ../README.md
