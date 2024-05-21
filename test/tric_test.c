@@ -728,6 +728,7 @@ void test_add_test_not(void) {
     assert(suite.number_of_tests == 0);
     assert(suite.tests == NULL);
     assert(context.test == NULL);
+    assert(context.mode == MODE_RESET);
 }
 
 
@@ -1614,12 +1615,13 @@ void test_skip_test_execution_not(void) {
     assert(test.before == TRIC_UNDEFINED);
     assert(test.result == TRIC_UNDEFINED);
     assert(test.after == TRIC_UNDEFINED);
+    assert(context.mode == MODE_SCAN);
 }
 
 
 
 void test_skip_test_execution_ok(void) {
-    /* skipped status should be set */
+    /* skipped status should be set and mode should be reset */
 
     struct tric_suite suite = { .skipped_tests = 0 };
     struct tric_test test = { .before = TRIC_UNDEFINED, .result = TRIC_UNDEFINED, .after = TRIC_UNDEFINED };
@@ -1641,6 +1643,7 @@ void test_skip_test_execution_ok(void) {
     assert(test_log_test_mock_data.suite == &suite);
     assert(test_log_test_mock_data.test == &test);
     assert(test_log_test_mock_data.data == &context);
+    assert(context.mode == MODE_RESET);
 }
 
 
