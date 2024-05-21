@@ -30,7 +30,7 @@ You should have received a copy of the GNU Lesser General Public License along w
  *
  * TRIC itself provides only a simple default reporting. The header tric_output.h defines functions to report the test results of TRIC in other output formats. The header tric.h must be included before the header tric_output.h can be included. Otherwise the compilation of the test suite will fail.
  *
- * Most of these functions must be called before the tests are executed (i.e. in a test suite setup fixture). The following example shows how to report test results in the TAP output format:
+ * Some of these functions must be called before any test is executed (i.e. in a test suite setup fixture). The following example shows how to report test results in the TAP output format:
  *
  * \code
 #include "tric.h"
@@ -52,6 +52,17 @@ SUITE("with TAP output", setup, NULL, NULL) {
  * \date 2024
  * \copyright GNU Lesser General Public License
  */
+
+
+
+/*
+ internally used
+print string representation of execution results
+*/
+void tric_print_result(enum tric_result result) {
+    const char *result_strings[] = { "undefined", "ok", "failure", "skipped", "crashed" };
+    printf("%s", result_strings[result + 1]);
+}
 
 
 
@@ -159,6 +170,94 @@ void tric_tap_test_point(struct tric_suite *suite, struct tric_test *test, void 
  */
 void tric_output_tap(void) {
     tric_log(tric_tap_header, tric_tap_test_point, NULL, NULL);
+}
+
+
+
+/*
+ internally used
+print csv header
+*/
+void tric_csv_header(bool unix_newline) {
+    printf("ID,RESULT,LINE,SIGNAL,BEFORE,AFTER,DESCRIPTION%s", unix_newline ? "\n" : "\r\n");
+}
+
+
+
+/*
+ internally used
+print csv header with newlines according to specification
+*/
+void tric_csv_header_standard(struct tric_suite *suite, struct tric_test *test, void *data) {
+    tric_csv_header(false);
+}
+
+
+
+/*
+ internally used
+print csv header with unix newlines
+*/
+void tric_csv_header_unix(struct tric_suite *suite, struct tric_test *test, void *data) {
+    tric_csv_header(true);
+}
+
+
+
+/*
+ internally used
+print csv record
+*/
+void tric_csv_record(struct tric_test *test, bool unix_newline) {
+    printf("%zu,", test->id);
+    tric_print_result(test->result);
+    printf(",%zu,%zu,", test->line, test->signal);
+    tric_print_result(test->before);
+    printf(",");
+    tric_print_result(test->after);
+    printf(",\"%s\"%s", test->description, unix_newline ? "\n" : "\r\n");
+}
+
+
+
+/*
+ internally used
+print csv record with newlines according to standard
+*/
+void tric_csv_record_standard(struct tric_suite *suite, struct tric_test *test, void *data) {
+    tric_csv_record(test, false);
+}
+
+
+
+/*
+ internally used
+print csv record with unix newlines
+*/
+void tric_csv_record_unix(struct tric_suite *suite, struct tric_test *test, void *data) {
+    tric_csv_record(test, true);
+}
+
+
+
+/**
+ * \brief CSV output
+ *
+ * Output test results in CSV (Comma Separated Values) format according to the specification in <a href="https://www.rfc-editor.org/rfc/rfc4180">RFC 4180</a>. The output of the csv header may be disabled by setting the header parameter to false..
+ *
+ * RFC 4180 requires CRLF newlines ("\r\n"). With the parameter unix_newline it is possible to report the test results with unix style LF newlines ("\n").
+ *
+ * This function must be called before any test in the test suite is executed (i.e. in the test suite setup fixture).
+ *
+ * \param header If set to true, the optional csv header is included in the test reporting.
+ * \param unix_newline If set to true, unix style newlines ("\n") will be used for the csv output. Otherwise CRLF newlines ("\r\n") will be used.
+ */
+void tric_output_csv(bool header, bool unix_newline) {
+    tric_logger_t start = NULL;
+    if (header) {
+        start = unix_newline ? tric_csv_header_unix : tric_csv_header_standard;
+    }
+    tric_log(start, unix_newline ? tric_csv_record_unix : tric_csv_record_standard, NULL, NULL);
 }
 
 
