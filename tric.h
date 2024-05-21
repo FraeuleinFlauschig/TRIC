@@ -663,6 +663,7 @@ void tric_skip_test_execution(struct tric_context *context, tric_fixture_t befor
     if (context->mode != MODE_EXECUTE) {
         return;
     }
+    context->mode = MODE_RESET;
     tric_set_status(context, EXIT_SKIP, before ? true : false, after ? true : false);
     tric_report()->test(context->suite, context->test, tric_report()->data);
 }
