@@ -344,6 +344,68 @@ void tric_output_csv_summary(bool header, bool unix_newline) {
 
 
 
+/*
+ internally used
+print test as json
+*/
+void tric_json_test(struct tric_test *test) {
+    printf("{ \"id\": %zu, \"description\": \"%s\", \"before\": \"", test->id, test->description);
+    tric_print_result(test->before);
+    printf("\", \"result\": \"");
+    tric_print_result(test->result);
+    printf("\", \"after\": \"");
+    tric_print_result(test->after);
+    printf("\", \"line\": %zu, \"signal\": %zu }", test->line, test->signal);
+}
+
+
+
+/*
+ internally used
+print all tests as json list
+*/
+void tric_json_tests(struct tric_suite *suite) {
+    printf("[ ");
+    struct tric_test *test = suite->tests;
+    while (test != NULL) {
+        tric_json_test(test);
+        if (test->next == NULL) {
+            printf(" ");
+            break;
+        }
+        printf(", ");
+        test = test->next;
+    }
+    printf("] ");
+}
+
+
+
+/*
+ internally used
+print suite as json
+*/
+void tric_json_suite(struct tric_suite *suite, struct tric_test *test, void *data) {
+    printf("{ \"description\": \"%s\", \"number_of_tests\": %zu, \"executed_tests\": %zu, \"failed_tests\": %zu, \"skipped_tests\": %zu, \"tests\": ", suite->description, suite->number_of_tests, suite->executed_tests, suite->failed_tests, suite->skipped_tests);
+    tric_json_tests(suite);
+    printf("}\n");
+}
+
+
+
+/**
+ * \brief JSON output
+ *
+ * Output the test results in <a href="https://en.wikipedia.org/wiki/JSON">JSON (JavaScript Object Notation)</a> format.
+ *
+ * This function must be called before any test in the test suite is executed (i.e. in the test suite setup fixture).
+ */
+void tric_output_json(void) {
+    tric_log(NULL, NULL, tric_json_suite, NULL);
+}
+
+
+
 #endif
 
 
