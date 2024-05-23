@@ -23,6 +23,10 @@ You should have received a copy of the GNU Lesser General Public License along w
 
 
 
+#include <string.h>
+
+
+
 /**
  * \file tric_output.h
  *
@@ -52,6 +56,9 @@ SUITE("with TAP output", setup, NULL, NULL) {
  * \date 2024
  * \copyright GNU Lesser General Public License
  */
+
+
+#define TRIC_OUTPUT_FORMAT "TRIC_OUTPUT_FORMAT"
 
 
 
@@ -402,6 +409,127 @@ void tric_json_suite(struct tric_suite *suite, struct tric_test *test, void *dat
  */
 void tric_output_json(void) {
     tric_log(NULL, NULL, tric_json_suite, NULL);
+}
+
+
+
+/*
+ internally used
+read TRIC_OUTPUT_FORMAT environment variable
+*/
+char *tric_environment_format(void) {
+    extern char **environ;
+    size_t i;
+    char *current;
+    for (i = 0; (current = environ[i]) != NULL; i++) {
+        char *separator = strchr(current, '=');
+        if (separator == NULL
+        || (separator - current) != strlen(TRIC_OUTPUT_FORMAT)) {
+            continue;
+        }
+        if (strncmp(current, TRIC_OUTPUT_FORMAT, strlen(TRIC_OUTPUT_FORMAT)) == 0) {
+            return separator + 1;
+        }
+    }
+    return NULL;
+}
+
+
+
+/*
+ internally used
+test if string of environment variable matches output format string
+*/
+bool tric_environment_match(char *environment_value, char *format) {
+    if (strlen(environment_value) != strlen(format)
+    || strcmp(environment_value, format) != 0) {
+        return false;
+    }
+    return true;
+}
+
+
+
+/**
+ * \brief Set output format with environment variable
+ *
+ * Output the test results in the format determined by the environment variable TRIC_OUTPUT_FORMAT. The following values for TRIC_OUTPUT_FORMAT are recognized:
+ *
+ * - tap
+ *
+ *   Output TAP format (i.e. tric_output_tap() will be called).
+ *
+ * - csv
+ *
+ *   Output CSV format without header (i.e. tric_output_csv(false, false) will be called).
+ *
+ * - csv_header
+ *
+ *   Output CSV format with header (i.e. tric_output_csv(true, false) will be called).
+ *
+ * - csv_unix
+ *
+ *   Output CSV format without header and with unix style newlines (i.e.  tric_output_csv(false, true) will be called).
+ *
+ * - csv_header_unix
+ *
+ *   Output CSV format with header and with unix style newlines (i.e. tric_output_csv(true, true) will be called).
+ *
+ * - csv_summary
+ *
+ *   Output CSV summary format without header (i.e. tric_output_csv_summary(false, false) will be called).
+ *
+ * - csv_summary_header
+ *
+ *   Output CSV summary format with header (i.e. tric_output_csv_summary(true, false) will be called).
+ *
+ * - csv_summary_unix
+ *
+ *   Output CSV summary format without header and with unix style newlines (i.e. tric_output_csv_summary(false, true) will be called).
+ *
+ * - csv_summary_header_unix
+ *
+ *   Output CSV summary format with header and with unix style newlines (i.e. tric_output_csv_summary(true, true) will be called).
+ *
+ * - json
+ *
+ *   Output JSON format (i.e. tric_output_json() will be called).
+ *
+ * - none
+ *
+ *   Do not report any test results (i.e. tric_log(NULL, NULL, NULL, NULL) will be called).
+ *
+ * Any other value for TRIC_OUTPUT_FORMAT or if TRIC_OUTPUT_FORMAT is not defined will set the default reporting of TRIC.
+ *
+ * This function must be called before any test in the test suite is executed (i.e. in the test suite setup fixture).
+ */
+void tric_output_environment(void) {
+    char *format = tric_environment_format();
+    if (format == NULL) {
+        return;
+    } else if (tric_environment_match(format, "tap")) {
+        tric_output_tap();
+    } else if (tric_environment_match(format, "csv")) {
+        tric_output_csv(false, false);
+    } else if (tric_environment_match(format, "csv_header")) {
+        tric_output_csv(true, false);
+    } else if (tric_environment_match(format, "csv_unix")) {
+        tric_output_csv(false, true);
+    } else if (tric_environment_match(format, "csv_header_unix")) {
+        tric_output_csv(true, true);
+    } else if (tric_environment_match(format, "csv_summary")) {
+        tric_output_csv_summary(false, false);
+    } else if (tric_environment_match(format, "csv_summary_header")) {
+        tric_output_csv_summary(true, false);
+    } else if (tric_environment_match(format, "csv_summary_unix")) {
+        tric_output_csv_summary(false, true);
+    } else if (tric_environment_match(format, "csv_summary_header_unix")) {
+        tric_output_csv_summary(true, true);
+    } else if (tric_environment_match(format, "json")) {
+        tric_output_json();
+    } else if (tric_environment_match(format, "none")) {
+        tric_log(NULL, NULL, NULL, NULL);
+    }
 }
 
 
