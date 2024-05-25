@@ -63,6 +63,54 @@ test 3 of 4 ("a crashing test") crashed with signal 11
 
 
 
+# Assertions
+
+TRIC itself includes only a basic ASSERT macro to verify test conditions. To simplify the writing of test conditions and to make the tests more readable, in addition to the header tric.h the header tric_assert.h can be included. This header contains a collection of assertion macros that internally use the ASSERT macro of TRIC. In order to use these macros, tric.h must be included before tric_assert.h can be included. Otherwise a compiler error will be generated.
+
+The following example test suite shows how to use the assertions in tric_assert.h:
+
+```
+#include "tric.h"
+#include "tric_assert.h"
+
+SUITE("assertion overview", NULL, NULL, NULL) {
+
+    TEST("single value assertions", NULL, NULL, NULL) {
+        int one = 1;
+        ASSERT_NOT(one < 0);
+        ASSERT_TRUE(one > 0);
+        ASSERT_FALSE(one != -1 && one < -1);
+        ASSERT_ZERO(one + -1);
+        ASSERT_NOT_ZERO(one + one);
+        ASSERT_POSITIVE(one);
+        ASSERT_NEGATIVE(0 - one);
+        int *pointer = NULL;
+        ASSERT_NULL(pointer);
+        pointer = &one;
+        ASSERT_NOT_NULL(pointer);
+    }
+
+    TEST("equality assertions", NULL, NULL, NULL) {
+        ASSERT_EQUAL(1, 1);
+        ASSERT_NOT_EQUAL(1, 0);
+        ASSERT_STRING_EQUAL("TRIC", "TRIC");
+        int m1[] = { 1, 2, 3 };
+        int m2[] = { 0, 1, 2, 3 };
+        ASSERT_MEMORY_EQUAL(m1, m2 + 1, sizeof(m1));
+        ASSERT_FLOAT_EQUAL(acos(-1.0), 3.1416, 0.0001);
+    }
+
+    TEST("flag assertions", NULL, NULL, NULL) {
+        int flags = O_WRONLY | O_APPEND | O_CREAT | O_EXCL;
+        ASSERT_FLAG(flags, O_EXCL);
+        ASSERT_NOT_FLAG(flags, O_TRUNC | O_NONBLOCK);
+    }
+
+}
+```
+
+
+
 # Test fixtures
 
 Setup and teardown fixtures can be specified for the test suite and for each test by passing the fixture function as an argument to the macro. A fixture can return false to indicate a problem and will prevent the test (or the whole suite) from running. There is also the possibility to write fixture code directly in the suite.
@@ -281,54 +329,6 @@ When the above code is run it produces the following output:
 | 2  | FAIL   |
 | 3  | FAIL   |
 |----|--------|
-```
-
-
-
-# Assertions
-
-TRIC itself includes only a simple ASSERT macro to verify test conditions. To simplify the writing of test conditions and to make the tests more readable, the header tric_assert.h can be included in addition to TRIC. This header contains a collection of assertion macros that internally use the ASSERT macro of TRIC. In order to use these macros, tric.h must be included before tric_assert.h can be included. Otherwise a compiler error will be generated.
-
-The following example test suite shows how to use the assertions in tric_assert.h:
-
-```
-#include "tric.h"
-#include "tric_assert.h"
-
-SUITE("assertion overview", NULL, NULL, NULL) {
-
-    TEST("single value assertions", NULL, NULL, NULL) {
-        int one = 1;
-        ASSERT_NOT(one < 0);
-        ASSERT_TRUE(one > 0);
-        ASSERT_FALSE(one != -1 && one < -1);
-        ASSERT_ZERO(one + -1);
-        ASSERT_NOT_ZERO(one + one);
-        ASSERT_POSITIVE(one);
-        ASSERT_NEGATIVE(0 - one);
-        int *pointer = NULL;
-        ASSERT_NULL(pointer);
-        pointer = &one;
-        ASSERT_NOT_NULL(pointer);
-    }
-
-    TEST("equality assertions", NULL, NULL, NULL) {
-        ASSERT_EQUAL(1, 1);
-        ASSERT_NOT_EQUAL(1, 0);
-        ASSERT_STRING_EQUAL("TRIC", "TRIC");
-        int m1[] = { 1, 2, 3 };
-        int m2[] = { 0, 1, 2, 3 };
-        ASSERT_MEMORY_EQUAL(m1, m2 + 1, sizeof(m1));
-        ASSERT_FLOAT_EQUAL(acos(-1.0), 3.1416, 0.0001);
-    }
-
-    TEST("flag assertions", NULL, NULL, NULL) {
-        int flags = O_WRONLY | O_APPEND | O_CREAT | O_EXCL;
-        ASSERT_FLAG(flags, O_EXCL);
-        ASSERT_NOT_FLAG(flags, O_TRUNC | O_NONBLOCK);
-    }
-
-}
 ```
 
 
