@@ -6,7 +6,7 @@ TRIC is a minimalistic unit testing framework for c. It has no external dependen
 
 
 
-## Features
+# Features
 
 + Everything is contained in a single header file. No linking of other resources is needed.
 + No further dependencies. Just include tric.h and write tests.
@@ -21,7 +21,7 @@ TRIC is a minimalistic unit testing framework for c. It has no external dependen
 
 
 
-## Example test suite
+# Example test suite
 
 The following example code shows the basic usage of TRIC. Tests need to be placed inside a test suite. A test suite is created with the SUITE macro and a test is created with the TEST macro. The ASSERT macro is used to verify an expression and lets the test fail if the expression is false.
 
@@ -63,7 +63,7 @@ test 3 of 4 ("a crashing test") crashed with signal 11
 
 
 
-## Test fixtures
+# Test fixtures
 
 Setup and teardown fixtures can be specified for the test suite and for each test by passing the fixture function as an argument to the macro. A fixture can return false to indicate a problem and will prevent the test (or the whole suite) from running. There is also the possibility to write fixture code directly in the suite.
 
@@ -166,7 +166,7 @@ Note the first line of the output: Before any test is run, the test suite is exe
 
 
 
-## Reporting test results in other output formats
+# Reporting test results in other output formats
 
 TRIC itself provides only a simple builtin reporting. To output the test results in other formats the header tric_output.h can be included in addition to tric.h. This header provides functions to output the test results in formats like TAP, CSV or JSON. To use these functions, tric.h must be included before tric_output.h can be included. Otherwise the compilation of the test suite will fail.
 
@@ -219,7 +219,7 @@ $ TRIC_OUTPUT_FORMAT=csv_summary ./list_test
 
 
 
-## Custom reporting of the test results
+# Custom reporting of the test results
 
 The default reporting of the test results can be replaced with custom logging functions. Reporting can be done in 3 situations: When the suite starts, after the execution of each test and at the end of the suite. To specify custom logging functions tric_log() needs to be called with the logging functions as arguments. To run tric_log() before the suite starts, a setup fixture for the test suite can be defined that contains the call to tric_log().
 
@@ -285,7 +285,7 @@ When the above code is run it produces the following output:
 
 
 
-## Assertions
+# Assertions
 
 TRIC itself includes only a simple ASSERT macro to verify test conditions. To simplify the writing of test conditions and to make the tests more readable, the header tric_assert.h can be included in addition to TRIC. This header contains a collection of assertion macros that internally use the ASSERT macro of TRIC. In order to use these macros, tric.h must be included before tric_assert.h can be included. Otherwise a compiler error will be generated.
 
@@ -333,7 +333,7 @@ SUITE("assertion overview", NULL, NULL, NULL) {
 
 
 
-## Documentation
+# Documentation
 
 The documentation for TRIC can be generated using [doxygen](https://www.doxygen.nl) by running doxygen in the doc directory. The generated html documentation can then be found in the doc/html directory.
 
