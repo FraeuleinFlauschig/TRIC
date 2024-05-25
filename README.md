@@ -166,6 +166,59 @@ Note the first line of the output: Before any test is run, the test suite is exe
 
 
 
+## Reporting test results in other output formats
+
+TRIC itself provides only a simple builtin reporting. To output the test results in other formats the header tric_output.h can be included in addition to tric.h. This header provides functions to output the test results in formats like TAP, CSV or JSON. To use these functions, tric.h must be included before tric_output.h can be included. Otherwise the compilation of the test suite will fail.
+
+The functions in tric_output.h must be called before any test is executed (i.e. in the setup fixture of the test suite). The following example shows how to output the test results in the TAP format:
+
+```
+#include "tric.h"
+#include "tric_output.h"
+
+
+
+/* setup fixture for the test suite */
+bool setup(void *data) {
+    tric_output_tap();
+    return true;
+}
+
+
+
+SUITE("TAP output for TRIC", setup, NULL, NULL) {
+    TEST("a successful test", NULL, NULL, NULL) {
+        ASSERT(0 == 0);
+    }
+    TEST("a failing test", NULL, NULL, NULL) {
+        ASSERT(0 > 1);
+    }
+    SKIP_TEST("a skipped test", NULL, NULL, NULL) {
+        ASSERT(0 < -1);
+    }
+}
+```
+
+When the above example is executed, it will produce the following output:
+
+```
+TAP version 14
+1..3 # TAP output for TRIC
+ok 1 - a successful test
+not ok 2 - a failing test
+ok 3 - a skipped test # SKIP
+```
+
+TRIC can only output a single test report at a time. To avoid editing and recompiling a test suite if multiple  output formats are needed, the function tric_output_environment() can be used. The output format can then be specified with the environment variable TRIC_OUTPUT_FORMAT when the test suite is executed.
+
+If for example a test suite executable called "list_test" using the function tric_output_environment() should output a summary of the test results in CSV format, it can be executed as follows:
+
+```
+$ TRIC_OUTPUT_FORMAT=csv_summary ./list_test
+```
+
+
+
 ## Custom reporting of the test results
 
 The default reporting of the test results can be replaced with custom logging functions. Reporting can be done in 3 situations: When the suite starts, after the execution of each test and at the end of the suite. To specify custom logging functions tric_log() needs to be called with the logging functions as arguments. To run tric_log() before the suite starts, a setup fixture for the test suite can be defined that contains the call to tric_log().
