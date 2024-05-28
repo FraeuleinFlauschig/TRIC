@@ -113,104 +113,274 @@ SUITE("assertion overview", NULL, NULL, NULL) {
 
 # Test fixtures
 
-Setup and teardown fixtures can be specified for the test suite and for each test by passing the fixture function as an argument to the macro. A fixture can return false to indicate a problem and will prevent the test (or the whole suite) from running. There is also the possibility to write fixture code directly in the suite.
+There are 3 methods to define test fixtures in TRIC:
 
-The following example shows how test fixtures can be defined:
++ As a fixture function that is passed to the SUITE macro
++ As a fixture function that is passed to a TEST macro
++ As a fixture block inside the test suite with the FIXTURE macro
+
+The different types of fixtures can also be mixed. The following sections describe the 3 fixture types in more detail.
+
+
+
+## Fixture function passed to the test suite
+
+Code that must run a single time before any test is executed (i.e. setup fixture) or that must run after all tests have finished executing (i.e. teardown fixture) can be defined in a function and can then be passed as an argument to the SUITE macro. If there are any problems during the setup of the test suite that will prevent the tests from running correctly (e.g. if some service can not be connected), the setup fixture function can return false to indicate the problem. In this case, no tests will be executed and the test suite executable will return with an error code.
+
+The SUITE macro can also take as an argument a pointer to some user data which will then be passed to the setup and teardown fixture functions. The pointer however must point to compile constant data. Otherwise the compilation will fail.
+
+The following example shows a simple test suite with a setup and a teardown fixture function passed to the SUITE macro.
 
 ```
 #include "tric.h"
 
 
 
-/* setup and teardown fixtures for the test suite */
-
+/* setup fixture function */
 bool setup(void *data) {
     printf("setting up suite with %s\n", (char *)data);
     return true;
 }
 
+
+
+/* teardown fixture function */
 bool teardown(void *data) {
     printf("tearing down suite with %s\n", (char *)data);
     return true;
 }
 
+
+
 /*
+user data
+
 note:
-user data must be passed as compile time constant data to 
-the test suite setup and teardown functions
+User data must be passed as compile time constant data to 
+the test suite setup and teardown functions. Defining the following string as 
+a pointer (i.e. as char *) would produce a compilation error.
 */
-char suite_user_data[] = "suite data";
+char user_data[] = "user data";
 
 
 
-/* fixtures running before and after a test */
+SUITE("with fixtures", setup, teardown, user_data) {
+    TEST("illustrating failure", NULL, NULL, NULL) {
+        ASSERT(1 == -1);
+    }
+}
+```
 
-bool before(void *data) {
-    printf("run before test with %s\n", (char *)data);
+When the above example is executed, the following output will be produced:
+
+```
+setting up suite with user data
+test suite "with fixtures" (1 test found):
+
+test 1 of 1 ("illustrating failure") failed at line 35
+
+1 test executed, 1 failed, 0 skipped, 1 total
+tearing down suite with user data
+```
+
+
+
+## Fixture function passed to a test
+
+If some code needs to be called to prepare the execution of one or multiple tests, the code can be defined in a setup fixture function and can then be passed as an argument to the corresponding TEST macros. Likewise code that needs to be called after a test has finished executing can be defined in a teardown fixture function and passed as an argument to the TEST macro.
+
+The setup and teardown fixture functions of a test will be executed in the same isolated process as the test itself. Therefore it is often not necessary to clean up resources allocated in a setup fixture with a corresponding teardown fixture. Memory that was allocated in a setup fixture for example will be cleaned up automatically when the isolated process terminates.
+
+If the setup fixture function of a test returns false (e.g. if some resource could not be allocated), the test as well as the teardown fixture function of the test (if defined) will not execute. The teardown fixture function of a test will also not execute if the test fails.
+
+In the following example a single setup fixture function and a single teardown fixture function are used for multiple tests in a test suite.
+
+```
+#include "tric.h"
+
+
+
+/* global memory */
+int value = 0;
+
+
+
+/* setup fixture function */
+bool setup(void *data) {
+    printf("setting up test with %s\n", (char *)data);
+    /* initialize global memory */
+    value++;
     return true;
 }
 
-bool after(void *data) {
-    printf("run after test with %s\n", (char *)data);
+
+
+/* teardown fixture function */
+bool teardown(void *data) {
+    printf("tearing down test with %s\n", (char *)data);
+    /* change global memory again */
+    value++;
     return true;
 }
 
-char *test_user_data = "test data";
+
+
+/* user data */
+char *user_data = "user data";
 
 
 
-SUITE("test suite with fixtures", setup, teardown, suite_user_data) {
+SUITE("with test fixtures", NULL, NULL, NULL) {
 
-    TEST("successful test", before, after, test_user_data) {
-        ASSERT(1 == 1);
+    TEST("using fixtures", setup, teardown, user_data) {
+        /* setup fixture should have changed global memory */
+        ASSERT(value == 1);
     }
 
-    /* if a test fails the fixture after the test will not run */
-    TEST("failing test", before, after, test_user_data) {
-        ASSERT(1 != 1);
+    TEST("illustrating failure", setup, teardown, user_data) {
+        /* last test changed global data in isolation */
+        ASSERT(value > 1);
     }
 
-    /*
-    note:
-    arbitrary code inside the test suite but outside 
-    of any test is executed twice
-    */
-    printf("some arbitrary code\n");
-    int one = 0;
-
-    /* use a fixture block to prevent code from running twice */
-    FIXTURE("inside suite") {
-        printf("arbitrary code inside a fixture block\n");
-        one = 1;
-    }
-
-    TEST("variable assigned in fixture block", NULL, NULL, NULL) {
-        ASSERT(one == 1);
+    TEST("using still fresh global data", setup, teardown, user_data) {
+        /* global data was changed by other tests in isolation */
+        ASSERT(value == 1);
     }
 
 }
 ```
 
-Running the above code produces the following output:
+When the above example is executed in a terminal, the following output is produced:
 
 ```
+test suite "with test fixtures" (3 tests found):
 
-some arbitrary code
-setting up suite with suite data
-test suite "test suite with fixtures" (3 tests found):
-
-run before test with test data
-run after test with test data
-run before test with test data
-test 2 of 3 ("failing test") failed at line 50
-some arbitrary code
-arbitrary code inside a fixture block
+setting up test with user data
+tearing down test with user data
+setting up test with user data
+test 2 of 3 ("illustrating failure") failed at line 44
+setting up test with user data
+tearing down test with user data
 
 3 tests executed, 1 failed, 0 skipped, 3 total
-tearing down suite with suite data
 ```
 
-Note the first line of the output: Before any test is run, the test suite is executed a first time to scan for tests. Because of that arbitrary code inside the test suite (that is not contained in a test or a fixture block) will be executed twice.
+The second test in the above example fails because the fixture functions of a test run in the same isolated process as the test itself. The memory changed by the fixture functions of a test remains unaffected in the parent process (i.e. the process of the test suite). Since the second test fails, the teardown fixture function of the test is not executed.
+
+The fixture functions of a test should not be used to implement a custom test result logging: When the output of the above example is redirected to a file, the lines printed by the fixture functions are not included in the output. The fixture functions run in separate child processes and only the output of the parent process (i.e. the process of the test suite) is redirected to the file. See below for how to implement a custom logging.
+
+
+
+## Fixture block inside the test suite
+
+Test fixture code can also be defined in a fixture block created with the FIXTURE macro. A FIXTURE block must be placed inside the test suite but outside of any test. Any number of fixture blocks can be defined inside the test suite.
+
+Fixture blocks can for example be used if some code must run after a test finished executing, independently of the result of the test: If a teardown fixture function is passed to the test and the test fails, the teardown fixture function is not executed. If some resource must be cleaned up (e.g. disconnect from a service), the code can be defined in a fixture block and placed after the corresponding test.
+
+In the following example two fixture blocks are used to setup and teardown a resource for a test.
+
+```
+#include "tric.h"
+
+SUITE("with fixture blocks", NULL, NULL, NULL) {
+
+    int file;
+    FIXTURE("to setup resource") {
+        file = open("/dev/zero", O_RDONLY);
+    }
+    TEST("resource setup by fixture block", NULL, NULL, NULL) {
+        int value = 1;
+        read(file, &value, sizeof(int));
+        ASSERT(value == 0);
+    }
+    FIXTURE("to teardown resource") {
+        close(file);
+    }
+
+}
+```
+
+Fixture blocks can also be used to place arbitrary code inside a test suite that is not contained in a test: When the executable of a test suite is run, the code inside the test suite is actually executed twice. A first time when scanning for tests and a second time when the tests are executed. If arbitrary code is not contained in a fixture block, it will also be executed twice and may for example lead to unwanted side effects.
+
+In the following example arbitrary code is placed in a test suite to illustrate that the code is executed twice if it is not protected inside a fixture block.
+
+```
+#include "tric.h"
+
+SUITE("with arbitrary code", NULL, NULL, NULL) {
+
+    /* will run twice */
+    printf("arbitrary code\n");
+
+    FIXTURE("to protect arbitrary code") {
+        /* runs only once */
+        printf("arbitrary code protected by fixture block\n");
+    }
+
+}
+```
+
+Executing the above example will produce the following output:
+
+```
+arbitrary code
+test suite "with arbitrary code" (0 tests found):
+
+arbitrary code
+arbitrary code protected by fixture block
+
+0 tests executed, 0 failed, 0 skipped, 0 total
+```
+
+The first line of the above output is produced by the unprotected code inside the test suite. The code is executed a first time when the test suite is scanned for tests and before the reporting starts. It is then executed a second time during test execution.
+
+The code inside a fixture block runs in the same process as the test suite. If a fixture block for example allocates memory, tests that use this memory run in separate processes and thus always get a fresh copy of the memory. It is therefore often not necessary to cleanup and reallocate resources allocated by a fixture block after each test that uses the resources.
+
+When a fixture block contains a return statement, it will immediately terminate the test suite. This can be used to terminate a test suite early if for example some fatal error occurs.
+
+The following example shows a test suite that uses a fixture block to terminate before all tests found in the test suite have finished executing. The example illustrates also that test data defined in the process of the test suite is not affected by the isolated execution of a test.
+
+```
+#include "tric.h"
+
+SUITE("terminating early", NULL, NULL, NULL) {
+
+    int test_data = 0;
+    FIXTURE("setting up test data") {
+        test_data = 1;
+    }
+
+    TEST("modifying test data", NULL, NULL, NULL) {
+        ASSERT(test_data == 1);
+        test_data = -1;
+        ASSERT(test_data < 0);
+    }
+
+    TEST("using unmodified test data", NULL, NULL, NULL) {
+        ASSERT(test_data == 1);
+    }
+
+    FIXTURE("to exit early") {
+        return;
+    }
+
+    TEST("that is not executed", NULL, NULL, NULL) {
+        ASSERT(test_data == 1);
+    }
+
+}
+```
+
+When the above example is executed, the following output will be produced:
+
+```
+test suite "terminating early" (3 tests found):
+
+
+2 tests executed, 0 failed, 0 skipped, 3 total
+```
+
+The above output shows that although there were 3 tests found in the test suite, only 2 of them were executed. this is because the test suite is terminated with a fixture block placed before the third test.
 
 
 
