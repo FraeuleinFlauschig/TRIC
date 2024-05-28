@@ -509,3 +509,9 @@ The documentation for TRIC can be generated using [doxygen](https://www.doxygen.
 
 
 
+# License
+
+TRIC is licensed under the GNU Lesser General Public License. A copy of the license can be found in the files COPYING and COPYING.LESSER or at the [GNU website](https://www.gnu.org/licenses/lgpl-3.0).
+
+
+
