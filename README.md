@@ -21,9 +21,27 @@ TRIC is a minimalistic unit testing framework for c. It has no external dependen
 
 
 
-# Example test suite
+# Introduction
 
-The following example code shows the basic usage of TRIC. Tests need to be placed inside a test suite. A test suite is created with the SUITE macro and a test is created with the TEST macro. The ASSERT macro is used to verify an expression and lets the test fail if the expression is false.
+TRIC consists of a single C header file and requires only standard C libraries. To use TRIC the header tric.h needs to be  copied into a location where the compiler can find it (either globally or next to the tests source files).
+
+In TRIC tests are contained in a test suite. When compiled and executed, a test suite detects and runs the contained tests automatically. There must be exactly one test suite per executable and all tests must be inside the test suite.
+
+A test suite is created with the SUITE macro. The first argument of the SUITE macro is a string describing the test suite and should not be omitted. The rest of the arguments are used for the setup and teardown fixture of the test suite and may be NULL.
+
+Any number of tests can be created inside the test suite with the TEST macro. The TEST macro has the same parameters as the SUITE macro. The description for the test should also not be omitted, while the arguments for the setup and teardown fixture of the test may be NULL.
+
+Inside a test the test conditions can be defined by using the ASSERT macro. If the expression passed as an argument to the ASSERT macro evaluates to false, the test will fail. Any number of ASSERT macros can be placed inside a test, the first failing ASSERT however will stop the test immediately.
+
+Each test of a test suite runs in an isolated child process. If a test crashes (e.g. by dereferencing a null pointer), the test will fail and the child process is terminated. The execution of the test suite continues even if one or multiple tests crash.
+
+If a test needs to be ignored during the execution of the test suite, the SKIP_TEST macro can be used. This macro has the same signature as the TEST macro. Therefore an existing test can be ignored by just prefixing the TEST macro with "SKIP_". If a test is ignored with the SKIP_TEST macro, it is still detected by the test suite during execution and the skipping of the test is mentioned when the test results are reported.
+
+
+
+## Basic example test suite
+
+The following example code shows the basic usage of TRIC.
 
 ```
 #include "tric.h"
@@ -60,6 +78,52 @@ test 3 of 4 ("a crashing test") crashed with signal 11
 
 3 tests executed, 2 failed, 1 skipped, 4 total
 ```
+
+
+
+## How it works
+
+To understand how TRIC works consider the following simple test suite. Blank lines are inserted for illustration purpose.
+
+```
+#include "tric.h"
+
+SUITE("simple suite", NULL, NULL, NULL) {
+
+    TEST("successful test", NULL, NULL, NULL) {
+
+        ASSERT(0 == 0);
+    }
+}
+```
+
+When compiled, the preprocessor translates the above example to something similar to the following code. The code below is greatly simplified and shows only the basic concept of TRIC.
+
+```
+void test_suite(void);
+int main(int argc, char *argv[]) {
+    test_suite();
+}
+
+void test_suite(void) {
+
+    pid_t child = fork();
+    if (child) {
+        waitpid(child);
+    } else {
+
+        if ( (0 == 0) != true ) {
+            exit(EXIT_FAILURE);
+        }
+    }
+}
+```
+
+The header tric.h declares the test_suite function and inserts the main function which then calls the test_suite function. The SUITE macro defines the test_suite function up to the parameter list.
+
+Inside the body of the test_suite function the TEST macro inserts the fork() call and the subsequent if statement up to the else statement. Inside the body of the else statement, the ASSERT macro inserts the test condition.
+
+When the test_suite function is executed, a child process is forked for each test in the test suite. The parent process waits for the completion of each child process before forking a new child. Inside a child process is the actual test executed. If a test condition of the test (inserted by an ASSERT macro) fails, the child process is terminated with an error code. If no test condition fails, the child process terminates normally.
 
 
 
