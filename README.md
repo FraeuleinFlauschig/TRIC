@@ -267,7 +267,7 @@ tearing down test with user data
 
 The second test in the above example fails because the fixture functions of a test run in the same isolated process as the test itself. The memory changed by the fixture functions of a test remains unaffected in the parent process (i.e. the process of the test suite). Since the second test fails, the teardown fixture function of the test is not executed.
 
-The fixture functions of a test should not be used to implement a custom test result logging: When the output of the above example is redirected to a file, the lines printed by the fixture functions are not included in the output. The fixture functions run in separate child processes and only the output of the parent process (i.e. the process of the test suite) is redirected to the file. See below for how to implement a custom logging.
+The fixture functions of a test should not be used to implement a custom test result logging: When the output of the above example is redirected to a file, the lines printed by the fixture functions are not included in the output. The fixture functions run in separate child processes and only the output of the parent process (i.e. the process of the test suite) is redirected to the file. See below for how to implement a custom test result reporting.
 
 
 
@@ -338,7 +338,7 @@ The code inside a fixture block runs in the same process as the test suite. If a
 
 When a fixture block contains a return statement, it will immediately terminate the test suite. This can be used to terminate a test suite early if for example some fatal error occurs.
 
-The following example shows a test suite that uses a fixture block to terminate before all tests found in the test suite have finished executing. The example illustrates also that test data defined in the process of the test suite is not affected by the isolated execution of a test.
+The following example shows a test suite that uses a fixture block to terminate execution before all of the tests found are executed. The example illustrates also that test data defined in the process of the test suite is not affected by the isolated execution of a test.
 
 ```
 #include "tric.h"
@@ -384,11 +384,17 @@ The above output shows that although there were 3 tests found in the test suite,
 
 
 
-# Reporting test results in other output formats
+# Reporting of the test results
 
-TRIC itself provides only a simple builtin reporting. To output the test results in other formats the header tric_output.h can be included in addition to tric.h. This header provides functions to output the test results in formats like TAP, CSV or JSON. To use these functions, tric.h must be included before tric_output.h can be included. Otherwise the compilation of the test suite will fail.
+TRIC has a simple builtin reporting to output the test results. To change the output format of the test results either the reporting functions in the additional header tric_output.h can be used or a custom reporting can be implemented.
 
-The functions in tric_output.h must be called before any test is executed (i.e. in the setup fixture of the test suite). The following example shows how to output the test results in the TAP format:
+
+
+## Reporting test results in other output formats
+
+To output the test results in other formats the header tric_output.h can be included in addition to tric.h. This header provides functions to output the test results in formats like TAP, CSV or JSON. To use these functions, tric.h must be included before tric_output.h can be included. Otherwise a compiler error will be generated.
+
+The functions in tric_output.h must be called before any test is executed (i.e. in the setup fixture of the test suite). The following example shows how to output the test results in the TAP format.
 
 ```
 #include "tric.h"
@@ -417,7 +423,7 @@ SUITE("TAP output for TRIC", setup, NULL, NULL) {
 }
 ```
 
-When the above example is executed, it will produce the following output:
+When the above example is executed, the output will look as follows:
 
 ```
 TAP version 14
@@ -427,7 +433,7 @@ not ok 2 - a failing test
 ok 3 - a skipped test # SKIP
 ```
 
-TRIC can only output a single test report at a time. To avoid editing and recompiling a test suite if multiple  output formats are needed, the function tric_output_environment() can be used. The output format can then be specified with the environment variable TRIC_OUTPUT_FORMAT when the test suite is executed.
+TRIC can only output a single report of the test results at a time. To avoid editing and recompiling a test suite if multiple  output formats are needed, the function tric_output_environment() can be used. The output format can then be specified with the environment variable TRIC_OUTPUT_FORMAT when the test suite is executed.
 
 If for example a test suite executable called "list_test" using the function tric_output_environment() should output a summary of the test results in CSV format, it can be executed as follows:
 
@@ -437,11 +443,17 @@ $ TRIC_OUTPUT_FORMAT=csv_summary ./list_test
 
 
 
-# Custom reporting of the test results
+## Custom reporting of the test results
 
-The default reporting of the test results can be replaced with custom logging functions. Reporting can be done in 3 situations: When the suite starts, after the execution of each test and at the end of the suite. To specify custom logging functions tric_log() needs to be called with the logging functions as arguments. To run tric_log() before the suite starts, a setup fixture for the test suite can be defined that contains the call to tric_log().
+The simple builtin test result reporting of TRIC can be replaced with a custom reporting by implementing logging functions. These logging functions need to be passed as arguments to the tric_log() function.
 
-In the following example the default reporting is replaced with a custom reporting that produces a simple markdown like table for the test results:
+Reporting of the test results can be done in 3 situations during the execution of a test suite: When the suite starts executing, directly after the execution of each test and before the end of the execution of the test suite. When the test suite starts executing, the number of tests in the suite has been determined and the reporting data for each test is set to initial values. After a test was executed, the reporting data of the corresponding test contains the result of the test execution as well as additional information (e.g. the reason why the test failed). The complete reporting data of the test suite and all tests contained in the suite is available at the end of the execution of the test suite.
+
+Separate logging functions for the start of the test suite, the end of a test and the end of the test suite can be passed to tric_log(). If an argument of tric_log() is NULL, no logging will be performed in the corresponding situation. If all arguments of tric_log() are NULL, test result reporting is disabled completely.
+
+To activate a custom test result reporting before the test suite starts executing, a setup fixture function for the test suite needs to be defined that contains the call to tric_log(). When tric_log() is called later in the test suite, logging starts with the default reporting.
+
+In the following example the default test result reporting of TRIC is replaced with custom logging functions that produce a simple markdown like table.
 
 ```
 #include "tric.h"
@@ -451,6 +463,7 @@ In the following example the default reporting is replaced with a custom reporti
 /* logging functions to produce a markdown like table */
 
 void table_header(struct tric_suite *suite, struct tric_test *test, void *data) {
+    printf("|----|--------|\n");
     printf("| ID | RESULT |\n");
     printf("|----|--------|\n");
 }
@@ -466,7 +479,6 @@ void table_footer(struct tric_suite *suite, struct tric_test *test, void *data) 
 
 
 /* setup fixture to activate table reporting */
-
 bool setup(void *data) {
     tric_log(table_header, table_row, table_footer, NULL);
     return true;
@@ -475,24 +487,23 @@ bool setup(void *data) {
 
 
 SUITE("printing markdown like table", setup, NULL, NULL) {
-    TEST("successful test", NULL, NULL, NULL) {
+    TEST("is successful", NULL, NULL, NULL) {
         ASSERT(0 == 0);
     }
-
-    TEST("failing test", NULL, NULL, NULL) {
+    TEST("is failing", NULL, NULL, NULL) {
         ASSERT(0 < 0);
     }
-
-    TEST("crashing test", NULL, NULL, NULL) {
+    TEST("is crashing", NULL, NULL, NULL) {
         int *null_pointer = NULL;
     ASSERT(*null_pointer == 0);
     }
 }
 ```
 
-When the above code is run it produces the following output:
+Running the above example produces the following output:
 
 ```
+|----|--------|
 | ID | RESULT |
 |----|--------|
 | 1  | OK     |
