@@ -8,16 +8,17 @@ TRIC is a minimalistic unit testing framework for c. It has no external dependen
 
 # Features
 
-+ Everything is contained in a single header file. No linking of other resources is needed.
-+ No further dependencies. Just include tric.h and write tests.
-+ Minimalistic API. Only a hand full of macros.
-+ Automatic test registration. No need to manually add test functions to an execution list or process the tests with an external tool.
-+ A main function is automatically inserted. Compiling the test suite produces a ready to run executable.
-+ Tests run isolated in their own processes. Even crashing tests do not stop the test suite.
-+ Setup and teardown fixtures can be set per test or for the entire test suite.
-+ Fixtures for a test run in the same isolated process as the test itself.
-+ Simple builtin default reporting of the test results.
-+ Custom reporting routines can be defined or reporting can be turned off completely.
++ TRIC is contained in a single C header file  requiring only a few POSIX libraries.
++ Minimalistic API consisting of not much more than a few macros.
++ No main function is needed: Including the header tric.h and compiling the tests will produce a ready to run executable.
++ Tests are automatically detected: No need to manually add tests to an execution list, processing the tests with an external tool or the like.
++ Each test is executed in an isolated process.
++ Multiple and flexible options to define test fixtures.
++ Simple mechanism to ignore tests.
++ Collection of additional assertions in the supplementary header tric_assert.h.
++ Simple builtin uncluttered reporting of the test results.
++ Straightforward mechanism to implement a custom test result reporting.
++ Support for various other output formats like TAP, CSV or JSON in the additional header tric_output.h.
 
 
 
