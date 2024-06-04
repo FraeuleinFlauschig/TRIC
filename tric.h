@@ -33,7 +33,7 @@ You should have received a copy of the GNU Lesser General Public License along w
  *
  * \brief TRIC - Testing Rules In C
  *
- * TRIC is a minimalistic unit testing framework for c. It has no external dependencies and is all contained in a single header file. Tests are automatically detected and are executed in separate processes. Test fixtures can be set per test or for the whole test suite. The default reporting can be easily replaced with a custom reporting.
+ * TRIC is a minimalistic unit testing framework for c. It has no external dependencies and is contained in a single header file. Tests are automatically detected and are executed in separate processes. TRIC features a flexible mechanism for defining test fixtures and has a builtin and customizable test result reporting.
  *
  * Example test suite:
  *
