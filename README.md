@@ -2,14 +2,14 @@
 
 # TRIC - Testing Rules In C
 
-TRIC is a minimalistic unit testing framework for c. It has no external dependencies and is all contained in a single header file. Tests are automatically detected and are executed in separate processes. TRIC features a flexible mechanism for defining test fixtures and supports reporting test results in various formats.
+TRIC is a minimalistic unit testing framework for c. It has no external dependencies and is contained in a single header file. Tests are automatically detected and are executed in separate processes. TRIC features a flexible mechanism for defining test fixtures and supports reporting test results in various formats.
 
 
 
 # Features
 
 + TRIC is contained in a single C header file  requiring only a few POSIX libraries.
-+ Minimalistic API consisting of not much more than a few macros.
++ Minimalistic API consisting of not much more than a couple of macros.
 + No main function is needed: Including the header tric.h and compiling the tests will produce a ready to run executable.
 + Tests are automatically detected: No need to manually add tests to an execution list, processing the tests with an external tool or the like.
 + Each test is executed in an isolated process.
@@ -577,6 +577,18 @@ Running the above example produces the following output:
 # Documentation
 
 The documentation for TRIC can be generated using [doxygen](https://www.doxygen.nl) by running doxygen in the doc directory. The generated html documentation can then be found in the doc/html directory.
+
+
+
+# Upcoming features
+
+TRIC is work in progress. The following list gives a quick insight about what is currently under construction:
+
++ Timing: Measure the execution time of a test, ability to terminate a test after some amount of time, etc.
++ XML output according to the [Surefire XML Report Schema](https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd).
++ Ability to temporarily run tests in separation: Execute a single test of a test suite without running the rest of the tests.
++ Additional assertions in tric_assert.h.
++ Mocking support.
 
 
 
