@@ -24,7 +24,7 @@ TRIC is a minimalistic unit testing framework for c. It has no external dependen
 
 # Introduction
 
-TRIC consists of a single C header file and requires only standard C libraries. To use TRIC the header tric.h needs to be  copied into a location where the compiler can find it (either globally or next to the tests source files).
+TRIC consists of a single C header file and requires only standard C libraries. To use TRIC the header tric.h needs to be  copied into a location where the compiler can find it (either globally or next to the tests source files). See below for download information.
 
 In TRIC tests are contained in a test suite. When compiled and executed, a test suite detects and runs the contained tests automatically. There must be exactly one test suite per executable and all tests must be inside the test suite.
 
@@ -574,9 +574,21 @@ Running the above example produces the following output:
 
 
 
+# Download
+
+The header files needed for TRIC can either be copied from the repository or directly downloaded, for example with [curl](https://en.wikipedia.org/wiki/CURL#curl), from the following URLs:
+
+| Header | URL |
+|---|---|
+| tric.h | www.philipcolombo.ch/download/tric/tric.h |
+| tric_assert.h | www.philipcolombo.ch/download/tric/tric_assert.h |
+| tric_output.h | www.philipcolombo.ch/download/tric/tric_output.h |
+
+
+
 # Documentation
 
-The documentation for TRIC can be generated using [doxygen](https://www.doxygen.nl) by running doxygen in the doc directory. The generated html documentation can then be found in the doc/html directory.
+The documentation for TRIC can be generated using [doxygen](https://www.doxygen.nl) by running doxygen in the doc directory of the repository. The generated html documentation can then be found in the doc/html directory.
 
 
 
@@ -594,7 +606,7 @@ TRIC is work in progress. The following list gives a quick insight about what is
 
 # License
 
-TRIC is licensed under the GNU Lesser General Public License. A copy of the license can be found in the files COPYING and COPYING.LESSER or at the [GNU website](https://www.gnu.org/licenses/lgpl-3.0).
+TRIC is licensed under the GNU Lesser General Public License. A copy of the license can be found in the files COPYING and COPYING.LESSER of the repository or at the [GNU website](https://www.gnu.org/licenses/lgpl-3.0).
 
 
 
