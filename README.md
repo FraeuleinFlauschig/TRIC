@@ -588,7 +588,7 @@ The header files needed for TRIC can either be copied from the repository or dir
 
 # Documentation
 
-The documentation for TRIC can be generated using [doxygen](https://www.doxygen.nl) by running doxygen in the doc directory of the repository. The generated html documentation can then be found in the doc/html directory.
+The documentation for TRIC can be generated locally with [doxygen](https://www.doxygen.nl) by running doxygen in the doc directory of the repository. The generated html documentation can then be found in the doc/html directory. The documentation can also be found online [here](http://www.philipcolombo.ch/tric/index.html).
 
 
 
