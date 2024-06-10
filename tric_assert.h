@@ -233,6 +233,81 @@ ASSERT( S1 != NULL && S2 != NULL && strcmp(S1, S2) == 0 )
 
 
 /**
+ * \brief Test a string to start with a prefix.
+ *
+ * If the string argument does not start with the prefix string argument, the test is terminated and marked as failed. If the string starts with the prefix, nothing happens and the execution of the test continues. If any of the arguments is NULL or the prefix is longer than the string, the assertion fails.
+ *
+ * \param S String to test.
+ * \param X Prefix string to find in S.
+ */
+#define ASSERT_STRING_PREFIX(S, X) \
+ASSERT( S != NULL && X != NULL && strlen(S) >= strlen(X) && strncmp(S, X, strlen(X)) == 0 )
+
+
+
+/**
+ * \brief Test a string to start with a prefix.
+ *
+ * Alias for ASSERT_STRING_PREFIX.
+ *
+ * \param S String to test.
+ * \param X prefix string to find in S.
+ */
+#define ASSERT_STRING_STARTS_WITH(S, X) ASSERT_STRING_PREFIX(S, X)
+
+
+
+/**
+ * \brief Test a string to end with a suffix.
+ *
+ * If the string argument does not end with the suffix string argument, the test is terminated and marked as failed. If the string ends with the suffix, nothing happens and the execution of the test continues. If any of the arguments is NULL or the suffix is longer than the string, the assertion fails.
+ *
+ * \param S String to test.
+ * \param X Suffix string to find in S.
+ */
+#define ASSERT_STRING_SUFFIX(S, X) \
+ASSERT( S != NULL && X != NULL && strlen(S) >= strlen(X) && strncmp((char *)(S) + (strlen(S) - strlen(X)), X, strlen(X)) == 0 )
+
+
+
+/**
+ * \brief Test a string to end with a suffix.
+ *
+ * Alias for ASSERT_STRING_SUFFIX.
+ *
+ * \param S String to test.
+ * \param X Suffix string to find in S.
+ */
+#define ASSERT_STRING_ENDS_WITH(S, X) ASSERT_STRING_SUFFIX(S, X)
+
+
+
+/**
+ * \brief Test a string to contain a substring.
+ *
+ * If the string argument does not contain the substring argument, the test is terminated and marked as failed. If the string contains the substring, nothing happens and the execution of the test continues. If any of the arguments is NULL or the substring is longer than the string, the assertion fails.
+ *
+ * \param S String to test.
+ * \param X Substring to find in S.
+ */
+#define ASSERT_STRING_CONTAINS(S, X) \
+ASSERT( S != NULL && X != NULL && strlen(S) >= strlen(X) && strstr(S, X) != NULL )
+
+
+
+/**
+ * \brief Test a string to contain a substring.
+ *
+ * Alias for ASSERT_STRING_CONTAINS.
+ *
+ * \param S String to test.
+ * \param X Substring to find in S.
+ */
+#define ASSERT_SUBSTRING(S, X) ASSERT_STRING_CONTAINS(S, X)
+
+
+
+/**
  * \brief Test for memory equality.
  *
  * If the given memory pointer arguments are not equal in the first SIZE bytes, the test is terminated and marked as failed. If the arguments are equal, nothing happens and the execution of the test continues. If any of the memory pointer arguments is NULL, the assertion fails.
