@@ -257,6 +257,113 @@ SUCCESSFUL_ASSERT_TEST(test_assert_string_equal_empty, ASSERT_STRING_EQUAL("", "
 
 
 
+/* string prefix assertion should fail if both arguments are NULL */
+FAILING_ASSERT_TEST(test_assert_string_prefix_null_null, ASSERT_STRING_PREFIX(NULL, NULL))
+
+/* string prefix assertion should fail if the second argument is NULL */
+FAILING_ASSERT_TEST(test_assert_string_prefix_string_null, ASSERT_STRING_PREFIX("test", NULL))
+
+/* string prefix assertion should fail if the first argument is NULL */
+FAILING_ASSERT_TEST(test_assert_string_prefix_null_string, ASSERT_STRING_PREFIX(NULL, "test"))
+
+/* string prefix assertion should fail if string starts not with prefix */
+FAILING_ASSERT_TEST(test_assert_string_prefix_fail, ASSERT_STRING_PREFIX("Testing Rules In C", "Rules In C"))
+
+/* string prefix assertion should fail if prefix is longer than string */
+FAILING_ASSERT_TEST(test_assert_string_prefix_too_long, ASSERT_STRING_PREFIX("Testing Rules", "Testing Rules In C"))
+
+/* string prefix assertion should be successful if string starts with prefix */
+SUCCESSFUL_ASSERT_TEST(test_assert_string_prefix_ok, ASSERT_STRING_PREFIX("Testing Rules In C", "Testing Rules"))
+
+/* string prefix assertion should be successful if both arguments are empty */
+SUCCESSFUL_ASSERT_TEST(test_assert_string_prefix_empty_empty, ASSERT_STRING_PREFIX("", ""))
+
+/* string prefix assertion should be successful if prefix is empty */
+SUCCESSFUL_ASSERT_TEST(test_assert_string_prefix_empty, ASSERT_STRING_PREFIX("Testing Rules In C", ""))
+
+
+
+/*
+string starts with assertion should be successful if string starts with prefix
+*/
+SUCCESSFUL_ASSERT_TEST(test_assert_string_starts_with_ok, ASSERT_STRING_STARTS_WITH("Testing Rules In C", "Testing Rules"))
+
+/* string starts with assertion should fail if string starts not with prefix */
+FAILING_ASSERT_TEST(test_assert_string_starts_with_fail, ASSERT_STRING_STARTS_WITH("Testing Rules In C", "Rules In C"))
+
+
+
+/* string suffix assertion should fail if both arguments are NULL */
+FAILING_ASSERT_TEST(test_assert_string_suffix_null_null, ASSERT_STRING_SUFFIX(NULL, NULL))
+
+/* string suffix assertion should fail if the second argument is NULL */
+FAILING_ASSERT_TEST(test_assert_string_suffix_string_null, ASSERT_STRING_SUFFIX("test", NULL))
+
+/* string suffix assertion should fail if the first argument is NULL */
+FAILING_ASSERT_TEST(test_assert_string_suffix_null_string, ASSERT_STRING_SUFFIX(NULL, "test"))
+
+/* string suffix assertion should fail if string ends not with suffix */
+FAILING_ASSERT_TEST(test_assert_string_suffix_fail, ASSERT_STRING_SUFFIX("Testing Rules In C", "Testing Rules"))
+
+/* string suffix assertion should fail if suffix is longer than string */
+FAILING_ASSERT_TEST(test_assert_string_suffix_too_long, ASSERT_STRING_SUFFIX("Testing Rules", "Testing Rules In C"))
+
+/* string suffix assertion should be successful if string ends with suffix */
+SUCCESSFUL_ASSERT_TEST(test_assert_string_suffix_ok, ASSERT_STRING_SUFFIX("Testing Rules In C", "Rules In C"))
+
+/* string suffix assertion should be successful if both arguments are empty */
+SUCCESSFUL_ASSERT_TEST(test_assert_string_suffix_empty_empty, ASSERT_STRING_SUFFIX("", ""))
+
+/* string suffix assertion should be successful if suffix is empty */
+SUCCESSFUL_ASSERT_TEST(test_assert_string_suffix_empty, ASSERT_STRING_SUFFIX("Testing Rules In C", ""))
+
+
+
+/* string ends with assertion should be successful if string ends with suffix */
+SUCCESSFUL_ASSERT_TEST(test_assert_string_ends_with_ok, ASSERT_STRING_ENDS_WITH("Testing Rules In C", "Rules In C"))
+
+/* string ends with assertion should fail if string ends not with suffix */
+FAILING_ASSERT_TEST(test_assert_string_ends_with_fail, ASSERT_STRING_ENDS_WITH("Testing Rules In C", "Testing Rules"))
+
+
+
+/* string contains assertion should fail if both arguments are NULL */
+FAILING_ASSERT_TEST(test_assert_string_contains_null_null, ASSERT_STRING_CONTAINS(NULL, NULL))
+
+/* string contains assertion should fail if the second argument is NULL */
+FAILING_ASSERT_TEST(test_assert_string_contains_string_null, ASSERT_STRING_CONTAINS("test", NULL))
+
+/* string contains assertion should fail if the first argument is NULL */
+FAILING_ASSERT_TEST(test_assert_string_contains_null_string, ASSERT_STRING_CONTAINS(NULL, "test"))
+
+/* string contains assertion should fail if string contains not content */
+FAILING_ASSERT_TEST(test_assert_string_contains_fail, ASSERT_STRING_CONTAINS("Testing Rules In C", "TRIC"))
+
+/* string contains assertion should fail if content is longer than string */
+FAILING_ASSERT_TEST(test_assert_string_contains_too_long, ASSERT_STRING_CONTAINS("Testing Rules", "Testing Rules In C"))
+
+/* string contains assertion should be successful if string contains content */
+SUCCESSFUL_ASSERT_TEST(test_assert_string_contains_ok, ASSERT_STRING_CONTAINS("Testing Rules In C", "Rules"))
+
+/* string contains assertion should be successful if content equals string */
+SUCCESSFUL_ASSERT_TEST(test_assert_string_contains_equal, ASSERT_STRING_CONTAINS("Testing Rules In C", "Testing Rules In C"))
+
+/* string contains assertion should be successful if both arguments are empty */
+SUCCESSFUL_ASSERT_TEST(test_assert_string_contains_empty_empty, ASSERT_STRING_CONTAINS("", ""))
+
+/* string contains assertion should be successful if content is empty */
+SUCCESSFUL_ASSERT_TEST(test_assert_string_contains_empty, ASSERT_STRING_CONTAINS("Testing Rules In C", ""))
+
+
+
+/* substring assertion should be successful if string contains substring */
+SUCCESSFUL_ASSERT_TEST(test_assert_substring_ok, ASSERT_SUBSTRING("Testing Rules In C", "Rules"))
+
+/* substring assertion should fail if string contains not substring */
+FAILING_ASSERT_TEST(test_assert_substring_fail, ASSERT_SUBSTRING("Testing Rules In C", "TRIC"))
+
+
+
 int test_assert_memory_equal_value1[] = { 1, 2, 3, 4 };
 int test_assert_memory_equal_value2[] = { 1, 2, 3, 4 };
 
@@ -378,6 +485,43 @@ int main(int argc, char *argv[]) {
     test_assert_string_equal_fail(argv[0]);
     test_assert_string_equal_ok(argv[0]);
     test_assert_string_equal_empty(argv[0]);
+
+    test_assert_string_prefix_null_null(argv[0]);
+    test_assert_string_prefix_string_null(argv[0]);
+    test_assert_string_prefix_null_string(argv[0]);
+    test_assert_string_prefix_fail(argv[0]);
+    test_assert_string_prefix_too_long(argv[0]);
+    test_assert_string_prefix_ok(argv[0]);
+    test_assert_string_prefix_empty_empty(argv[0]);
+    test_assert_string_prefix_empty(argv[0]);
+
+    test_assert_string_starts_with_ok(argv[0]);
+    test_assert_string_starts_with_fail(argv[0]);
+
+    test_assert_string_suffix_null_null(argv[0]);
+    test_assert_string_suffix_string_null(argv[0]);
+    test_assert_string_suffix_null_string(argv[0]);
+    test_assert_string_suffix_fail(argv[0]);
+    test_assert_string_suffix_too_long(argv[0]);
+    test_assert_string_suffix_ok(argv[0]);
+    test_assert_string_suffix_empty_empty(argv[0]);
+    test_assert_string_suffix_empty(argv[0]);
+
+    test_assert_string_ends_with_ok(argv[0]);
+    test_assert_string_ends_with_fail(argv[0]);
+
+    test_assert_string_contains_null_null(argv[0]);
+    test_assert_string_contains_string_null(argv[0]);
+    test_assert_string_contains_null_string(argv[0]);
+    test_assert_string_contains_fail(argv[0]);
+    test_assert_string_contains_too_long(argv[0]);
+    test_assert_string_contains_ok(argv[0]);
+    test_assert_string_contains_equal(argv[0]);
+    test_assert_string_contains_empty_empty(argv[0]);
+    test_assert_string_contains_empty(argv[0]);
+
+    test_assert_substring_ok(argv[0]);
+    test_assert_substring_fail(argv[0]);
 
     test_assert_memory_equal_null_null(argv[0]);
     test_assert_memory_equal_memory_null(argv[0]);
