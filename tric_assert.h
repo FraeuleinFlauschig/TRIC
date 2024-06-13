@@ -228,7 +228,7 @@ ASSERT( tric_assert_not_flag((B), (F)) == true )
  * \param S2 Second string to test.
  */
 #define ASSERT_STRING_EQUAL(S1, S2) \
-ASSERT( S1 != NULL && S2 != NULL && strcmp(S1, S2) == 0 )
+ASSERT( tric_assert_string_equal((S1), (S2)) == true )
 
 
 
@@ -241,7 +241,7 @@ ASSERT( S1 != NULL && S2 != NULL && strcmp(S1, S2) == 0 )
  * \param X Prefix string to find in S.
  */
 #define ASSERT_STRING_PREFIX(S, X) \
-ASSERT( S != NULL && X != NULL && strlen(S) >= strlen(X) && strncmp(S, X, strlen(X)) == 0 )
+ASSERT( tric_assert_string_prefix((S), (X)) == true )
 
 
 
@@ -266,7 +266,7 @@ ASSERT( S != NULL && X != NULL && strlen(S) >= strlen(X) && strncmp(S, X, strlen
  * \param X Suffix string to find in S.
  */
 #define ASSERT_STRING_SUFFIX(S, X) \
-ASSERT( S != NULL && X != NULL && strlen(S) >= strlen(X) && strncmp((char *)(S) + (strlen(S) - strlen(X)), X, strlen(X)) == 0 )
+ASSERT( tric_assert_string_suffix((S), (X)) == true )
 
 
 
@@ -291,7 +291,7 @@ ASSERT( S != NULL && X != NULL && strlen(S) >= strlen(X) && strncmp((char *)(S) 
  * \param X Substring to find in S.
  */
 #define ASSERT_STRING_CONTAINS(S, X) \
-ASSERT( S != NULL && X != NULL && strlen(S) >= strlen(X) && strstr(S, X) != NULL )
+ASSERT( tric_assert_string_contains((S), (X)) == true )
 
 
 
@@ -354,6 +354,64 @@ test if certain flags are not set in bits
 */
 bool tric_assert_not_flag(size_t bits, size_t flags) {
     if (bits == 0 || (bits & flags) == 0) {
+        return true;
+    }
+    return false;
+}
+
+
+
+/*
+ internally used
+test if strings are equal
+*/
+bool tric_assert_string_equal(const char *s1, const char *s2) {
+    if (s1 != NULL && s2 != NULL && strcmp(s1, s2) == 0) {
+        return true;
+    }
+    return false;
+}
+
+
+
+/*
+ internally used
+test if string starts with prefix
+*/
+bool tric_assert_string_prefix(const char *string, const char *prefix) {
+    if (string != NULL && prefix != NULL
+    && strlen(string) >= strlen(prefix)
+    && strncmp(string, prefix, strlen(prefix)) == 0) {
+        return true;
+    }
+    return false;
+}
+
+
+
+/*
+ internally used
+test if string ends with suffix
+*/
+bool tric_assert_string_suffix(const char *string, const char *suffix) {
+    if (string != NULL && suffix != NULL
+    && strlen(string) >= strlen(suffix)
+    && strncmp((char *)(string) + (strlen(string) - strlen(suffix)), suffix, strlen(suffix)) == 0) {
+        return true;
+    }
+    return false;
+}
+
+
+
+/*
+ internally used
+test if string contains substring
+*/
+bool tric_assert_string_contains(const char *string, const char *substring) {
+    if (string != NULL && substring != NULL
+    && strlen(string) >= strlen(substring)
+    && strstr(string, substring) != NULL) {
         return true;
     }
     return false;
