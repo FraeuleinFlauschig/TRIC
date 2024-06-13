@@ -317,7 +317,7 @@ ASSERT( tric_assert_string_contains((S), (X)) == true )
  * \param SIZE Number of bytes to test.
  */
 #define ASSERT_MEMORY_EQUAL(M1, M2, SIZE) \
-ASSERT( M1 != NULL && M2 != NULL && memcmp(M1, M2, SIZE) == 0 )
+ASSERT( tric_assert_memory_equal(M1, M2, SIZE) == true )
 
 
 
@@ -412,6 +412,19 @@ bool tric_assert_string_contains(const char *string, const char *substring) {
     if (string != NULL && substring != NULL
     && strlen(string) >= strlen(substring)
     && strstr(string, substring) != NULL) {
+        return true;
+    }
+    return false;
+}
+
+
+
+/*
+ internally used
+test if memory areas are equal
+*/
+bool tric_assert_memory_equal(void *m1, void *m2, size_t size) {
+    if (m1 != NULL && m2 != NULL && memcmp(m1, m2, size) == 0) {
         return true;
     }
     return false;
