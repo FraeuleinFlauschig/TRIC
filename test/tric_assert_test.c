@@ -447,7 +447,7 @@ FAILING_ASSERT_TEST(test_assert_memory_equal_memory_null, ASSERT_MEMORY_EQUAL(te
 FAILING_ASSERT_TEST(test_assert_memory_equal_null_memory, ASSERT_MEMORY_EQUAL(NULL, test_assert_memory_equal_value1, sizeof(test_assert_memory_equal_value1)))
 
 /* memory assertion should fail if the arguments are not equal */
-FAILING_ASSERT_TEST(test_assert_memory_equal_fail, ASSERT_MEMORY_EQUAL(test_assert_memory_equal_value1, test_assert_memory_equal_value1 + 1, sizeof(test_assert_memory_equal_value1) - sizeof(int)))
+FAILING_ASSERT_TEST(test_assert_memory_equal_fail, ASSERT_MEMORY_EQUAL(test_assert_memory_equal_value1, test_assert_memory_equal_value2 + 1, sizeof(test_assert_memory_equal_value1) - sizeof(int)))
 
 /* memory assertion should be successful if both arguments are equal */
 SUCCESSFUL_ASSERT_TEST(test_assert_memory_equal_ok, ASSERT_MEMORY_EQUAL(test_assert_memory_equal_value1, test_assert_memory_equal_value2, sizeof(test_assert_memory_equal_value1)))
@@ -460,6 +460,18 @@ memory assertion should be not successful if the size argument is larger
 than the size of the memory arguments
 */
 FAILING_ASSERT_TEST(test_assert_memory_equal_fail_size, ASSERT_MEMORY_EQUAL(test_assert_memory_equal_value1, test_assert_memory_equal_value2, sizeof(test_assert_memory_equal_value1) + 1))
+
+/*
+passing a function as argument to the memory equal assertion should execute the 
+function only once
+*/
+void *test_assert_memory_equal_func_function(void) {
+    static int counter = -1;
+    static int memory[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+    counter++;
+    return counter < 5 ? memory + counter : memory + 5;
+}
+SUCCESSFUL_ASSERT_TEST(test_assert_memory_equal_func, ASSERT_MEMORY_EQUAL(test_assert_memory_equal_func_function(), test_assert_memory_equal_value1, sizeof(test_assert_memory_equal_value1)))
 
 
 
@@ -606,6 +618,7 @@ int main(int argc, char *argv[]) {
     test_assert_memory_equal_ok(argv[0]);
     test_assert_memory_equal_zero(argv[0]);
     test_assert_memory_equal_fail_size(argv[0]);
+    test_assert_memory_equal_func(argv[0]);
 
     test_assert_float_equal_positive_zero(argv[0]);
     test_assert_float_equal_negative_zero(argv[0]);
