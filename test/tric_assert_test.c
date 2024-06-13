@@ -206,6 +206,17 @@ SUCCESSFUL_ASSERT_TEST(test_assert_flag_ok_multiple, ASSERT_FLAG(7, 5))
 /* flag assertion should be successful if both arguments are 0 */
 SUCCESSFUL_ASSERT_TEST(test_assert_flag_ok_zero, ASSERT_FLAG(0, 0))
 
+/*
+passing a function as argument to the flag assertion should execute the function 
+only once
+*/
+int test_assert_flag_func_function(void) {
+    static int flags = 0;
+    flags++;
+    return flags;
+}
+SUCCESSFUL_ASSERT_TEST(test_assert_flag_func, ASSERT_FLAG(1, test_assert_flag_func_function()))
+
 
 
 /*
@@ -234,6 +245,17 @@ SUCCESSFUL_ASSERT_TEST(test_assert_not_flag_ok_multiple, ASSERT_NOT_FLAG(2, 5))
 
 /* not flag assertion should be successful if both arguments are 0 */
 SUCCESSFUL_ASSERT_TEST(test_assert_not_flag_ok_zero, ASSERT_NOT_FLAG(0, 0))
+
+/*
+passing a function as argument to the not flag assertion should execute the 
+function only once
+*/
+int test_assert_not_flag_func_function(void) {
+    static int flags = 0;
+    flags++;
+    return flags;
+}
+SUCCESSFUL_ASSERT_TEST(test_assert_not_flag_func, ASSERT_NOT_FLAG(test_assert_not_flag_func_function(), 2))
 
 
 
@@ -472,12 +494,14 @@ int main(int argc, char *argv[]) {
     test_assert_flag_ok(argv[0]);
     test_assert_flag_ok_multiple(argv[0]);
     test_assert_flag_ok_zero(argv[0]);
+    test_assert_flag_func(argv[0]);
 
     test_assert_not_flag_fail(argv[0]);
     test_assert_not_flag_fail_multiple(argv[0]);
     test_assert_not_flag_ok(argv[0]);
     test_assert_not_flag_ok_multiple(argv[0]);
     test_assert_not_flag_ok_zero(argv[0]);
+    test_assert_not_flag_func(argv[0]);
 
     test_assert_string_equal_null_null(argv[0]);
     test_assert_string_equal_string_null(argv[0]);
