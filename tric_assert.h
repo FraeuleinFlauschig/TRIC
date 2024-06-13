@@ -202,7 +202,7 @@ ASSERT( (V) < 0 )
  * \param F Flags to check if set in B.
  */
 #define ASSERT_FLAG(B, F) \
-ASSERT( ( (F) == 0 && (B) == 0 ) || ( (B) & (F) ) != 0 )
+ASSERT( tric_assert_flag((B), (F)) == true )
 
 
 
@@ -215,7 +215,7 @@ ASSERT( ( (F) == 0 && (B) == 0 ) || ( (B) & (F) ) != 0 )
  * \param F Flags to check if not set in B.
  */
 #define ASSERT_NOT_FLAG(B, F) \
-ASSERT( (B) == 0 || ( (B) & (F) ) == 0 )
+ASSERT( tric_assert_not_flag((B), (F)) == true )
 
 
 
@@ -332,6 +332,32 @@ ASSERT( M1 != NULL && M2 != NULL && memcmp(M1, M2, SIZE) == 0 )
  */
 #define ASSERT_FLOAT_EQUAL(F1, F2, PRECISION) \
 ASSERT( fabs( (double)(F1) - (double)(F2) ) < (double)(PRECISION) )
+
+
+
+/*
+ internally used
+test if certain flags are set in bits
+*/
+bool tric_assert_flag(size_t bits, size_t flags) {
+    if ((flags == 0 && bits == 0) || (bits & flags) != 0) {
+        return true;
+    }
+    return false;
+}
+
+
+
+/*
+ internally used
+test if certain flags are not set in bits
+*/
+bool tric_assert_not_flag(size_t bits, size_t flags) {
+    if (bits == 0 || (bits & flags) == 0) {
+        return true;
+    }
+    return false;
+}
 
 
 
