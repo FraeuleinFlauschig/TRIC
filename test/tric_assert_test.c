@@ -277,6 +277,18 @@ SUCCESSFUL_ASSERT_TEST(test_assert_string_equal_ok, ASSERT_STRING_EQUAL("test", 
 /* string assertion should be successful if both arguments are empty strings */
 SUCCESSFUL_ASSERT_TEST(test_assert_string_equal_empty, ASSERT_STRING_EQUAL("", ""))
 
+/*
+passing a function as argument to the string assertion should execute the 
+function only once
+*/
+const char *test_assert_string_equal_func_function(void) {
+    static int counter = -1;
+    const char *strings[] = { "zero", "one", "two", "more than two" };
+    counter++;
+    return strings[counter <= 3 ? counter : 3];
+}
+SUCCESSFUL_ASSERT_TEST(test_assert_string_equal_func, ASSERT_STRING_EQUAL(test_assert_string_equal_func_function(), "zero"))
+
 
 
 /* string prefix assertion should fail if both arguments are NULL */
@@ -302,6 +314,18 @@ SUCCESSFUL_ASSERT_TEST(test_assert_string_prefix_empty_empty, ASSERT_STRING_PREF
 
 /* string prefix assertion should be successful if prefix is empty */
 SUCCESSFUL_ASSERT_TEST(test_assert_string_prefix_empty, ASSERT_STRING_PREFIX("Testing Rules In C", ""))
+
+/*
+passing a function as argument to the string prefix assertion should execute the 
+function only once
+*/
+const char *test_assert_string_prefix_func_function(void) {
+    static int counter = -1;
+    const char *strings[] = { "zero and one", "two and more", "a lot" };
+    counter++;
+    return strings[counter <= 2 ? counter : 2];
+}
+SUCCESSFUL_ASSERT_TEST(test_assert_string_prefix_func, ASSERT_STRING_PREFIX(test_assert_string_prefix_func_function(), "zero"))
 
 
 
@@ -339,6 +363,18 @@ SUCCESSFUL_ASSERT_TEST(test_assert_string_suffix_empty_empty, ASSERT_STRING_SUFF
 /* string suffix assertion should be successful if suffix is empty */
 SUCCESSFUL_ASSERT_TEST(test_assert_string_suffix_empty, ASSERT_STRING_SUFFIX("Testing Rules In C", ""))
 
+/*
+passing a function as argument to the string suffix assertion should execute the 
+function only once
+*/
+const char *test_assert_string_suffix_func_function(void) {
+    static int counter = -1;
+    const char *strings[] = { "zero and one", "two and more", "a lot" };
+    counter++;
+    return strings[counter <= 2 ? counter : 2];
+}
+SUCCESSFUL_ASSERT_TEST(test_assert_string_suffix_func, ASSERT_STRING_SUFFIX(test_assert_string_suffix_func_function(), "one"))
+
 
 
 /* string ends with assertion should be successful if string ends with suffix */
@@ -375,6 +411,18 @@ SUCCESSFUL_ASSERT_TEST(test_assert_string_contains_empty_empty, ASSERT_STRING_CO
 
 /* string contains assertion should be successful if content is empty */
 SUCCESSFUL_ASSERT_TEST(test_assert_string_contains_empty, ASSERT_STRING_CONTAINS("Testing Rules In C", ""))
+
+/*
+passing a function as argument to the string contains assertion should execute 
+the function only once
+*/
+const char *test_assert_string_contains_func_function(void) {
+    static int counter = -1;
+    const char *strings[] = { "zero and one", "two or more", "a lot" };
+    counter++;
+    return strings[counter <= 2 ? counter : 2];
+}
+SUCCESSFUL_ASSERT_TEST(test_assert_string_contains_func, ASSERT_STRING_CONTAINS(test_assert_string_contains_func_function(), "and"))
 
 
 
@@ -509,6 +557,7 @@ int main(int argc, char *argv[]) {
     test_assert_string_equal_fail(argv[0]);
     test_assert_string_equal_ok(argv[0]);
     test_assert_string_equal_empty(argv[0]);
+    test_assert_string_equal_func(argv[0]);
 
     test_assert_string_prefix_null_null(argv[0]);
     test_assert_string_prefix_string_null(argv[0]);
@@ -518,6 +567,7 @@ int main(int argc, char *argv[]) {
     test_assert_string_prefix_ok(argv[0]);
     test_assert_string_prefix_empty_empty(argv[0]);
     test_assert_string_prefix_empty(argv[0]);
+    test_assert_string_prefix_func(argv[0]);
 
     test_assert_string_starts_with_ok(argv[0]);
     test_assert_string_starts_with_fail(argv[0]);
@@ -530,6 +580,7 @@ int main(int argc, char *argv[]) {
     test_assert_string_suffix_ok(argv[0]);
     test_assert_string_suffix_empty_empty(argv[0]);
     test_assert_string_suffix_empty(argv[0]);
+    test_assert_string_suffix_func(argv[0]);
 
     test_assert_string_ends_with_ok(argv[0]);
     test_assert_string_ends_with_fail(argv[0]);
@@ -543,6 +594,7 @@ int main(int argc, char *argv[]) {
     test_assert_string_contains_equal(argv[0]);
     test_assert_string_contains_empty_empty(argv[0]);
     test_assert_string_contains_empty(argv[0]);
+    test_assert_string_contains_func(argv[0]);
 
     test_assert_substring_ok(argv[0]);
     test_assert_substring_fail(argv[0]);
